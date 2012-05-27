@@ -108,7 +108,8 @@ Template.user.events = {
 
 Template.entry.events = {
 	'keyup #entry .pattern' : function () {
-		$('#entry .preview').html(converter.makeHtml($('#entry .pattern').val().replace('<', '&lt;').replace('>', '&gt;')));
+		Meteor.defer(sh_highlightDocument);
+		$('#entry .preview').html(correctMarkdownCode($('#entry .pattern').val()));
 	},
 	'click #entry .addPattern' : function () {
 		Meteor.call('addPattern',
@@ -146,11 +147,27 @@ Template.pattern.pattern = function () {
 	return Patterns.findOne({ _id : Session.get('current_pattern')});
 };
 
+var correctMarkdownCode = function (input) {
+	var output = '';
+	var process = $(converter.makeHtml(input.replace(/</g, '&lt;').replace(/>/g, '&gt;')))
+	process.find('code').each(function () {
+		if ($(this).html().match(/^[ ]*&amp;lt;/g))
+			$(this).closest('pre').addClass('sh_html');
+		else
+			$(this).closest('pre').addClass('sh_javascript_dom');
+		$(this).html(function (i, h) {
+			return h.replace(/&amp;lt;/g, '&lt;').replace(/&amp;gt;/g, '&gt;');
+		});
+	});
+	process.each(function () {
+		output += $('<div></div>').append(this).html();
+	});
+	return output;
+}
+
 Template.pattern.body = function () {
-	var body = Patterns.findOne({ _id : Session.get('current_pattern')}).body;
-	var code = converter.makeHtml(body.replace('<', '&lt;').replace('>', '&gt;'));
 	Meteor.defer(sh_highlightDocument);
-	return code.replace('<pre', '<pre class="sh_javascript_dom"');
+	return correctMarkdownCode(Patterns.findOne({ _id : Session.get('current_pattern')}).body);
 };
 
 var showPage = function (page) {
