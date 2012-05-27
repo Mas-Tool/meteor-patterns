@@ -1,0 +1,86 @@
+<head>
+	<title>Meteor Patterns</title>
+</head>
+
+<body>
+	<div id="container">
+		<h1><a href="/">Meteor Patterns</a></h1>
+
+		{{> user}}
+
+		{{> description}}
+
+		{{> entry}}
+
+		<div id="page">
+		</div>
+	</div>
+</body>
+
+<template name="user">
+	<div id="user">
+		{{#if loggedIn}}
+		Welcome, {{userName}}! <input type="button" class="logout" value="Log out">
+		{{else}}
+		<input type="text" class="name" value="Name">
+		<input type="password" class="pass" value="Password">
+		<input type="button" class="register" value="Register">
+		<input type="button" class="login" value="Log in">
+		<span class="error">{{error}}</span>
+		{{/if}}
+	</div>
+</template>
+	
+<template name="description">
+	<div class="description">A cookbook filled with magic patterns known to be useful for forming your Meteor crater.</div>
+</template>
+
+<template name='entry'>
+	<div id="entry">
+		<label>Name:</label>
+		<input type="text" class="name">
+
+		<label>Description:</label>
+		<input type="text" class="description">
+
+		<label>Pattern: (<a href="http://www.kreatives-chaos.com/markdown_help.html" target="_blank">Markdown help</a>)</label>
+		<textarea class="pattern"></textarea>
+
+		<label>Preview:</label>
+		<div class="preview"></div>
+
+		<input type="button" class="addPattern" value="Add pattern to cookbook!">
+	</div>
+</template>
+
+<template name="patterns">
+	<div id="patterns">
+		<input type="button" class="addPattern" value="Add a pattern">
+
+		<ul>
+		{{#each patterns}}
+			<li>
+				<div class="left">
+					<h2><a href="/{{_id}}">{{name}}</a></h2>
+					<p>{{description}}</p>
+				</div>
+				{{#if admin}}
+				<div class="right">					
+					<input type="button" class="removePattern" value="Remove">
+				</div>
+				{{/if}}
+			</li>
+		{{/each}}
+		</ul>
+	</div>
+</template>
+
+<template name="pattern">
+	{{#with pattern}}
+		<h2>{{name}}</h2>
+		<p>{{description}}</p>
+
+		<hr />
+	{{/with}}
+	<div class="preview">{{{body}}}</div>
+</template>
